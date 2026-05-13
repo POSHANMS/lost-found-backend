@@ -7,6 +7,10 @@ from flask_mail import Mail
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
 import os
+from models.user import User
+from models.item import Item
+from models.claim import Claim
+from models.notification import Notification
 
 # Load all variables from .env file into environment
 load_dotenv()
@@ -54,4 +58,6 @@ def index():
 
 # Start the server
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()                # creates all tables in PostgreSQL if they don't exist
     socketio.run(app, debug=True)
