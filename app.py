@@ -27,6 +27,9 @@ from models.item import Item
 from models.claim import Claim
 from models.notification import Notification
 
+from routes.auth import auth_bp
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
+
 @app.route("/")
 def index():
     return {"message": "FindIt API is running!"}
