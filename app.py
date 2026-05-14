@@ -16,6 +16,7 @@ app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["RATELIMIT_STORAGE_URI"] = os.getenv("REDIS_URL")
 
 db.init_app(app)
 ma.init_app(app)
