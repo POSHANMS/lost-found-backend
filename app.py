@@ -2,6 +2,7 @@ from flask import Flask
 from extensions import db, ma, mail, socketio, limiter
 from dotenv import load_dotenv
 from flask_limiter.util import get_remote_address
+from flask_cors import CORS
 import os
 
 load_dotenv()
