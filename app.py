@@ -30,6 +30,9 @@ from models.notification import Notification
 from routes.auth import auth_bp
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
+from routes.items import items_bp
+app.register_blueprint(items_bp, url_prefix="/api/items")
+
 @app.route("/")
 def index():
     return {"message": "FindIt API is running!"}
