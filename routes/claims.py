@@ -4,6 +4,7 @@ from models.claim import Claim
 from models.item import Item
 from models.notification import Notification
 from utils.auth_middleware import token_required
+from schemas.claim_schema import ClaimSchema, ClaimResponseSchema
 
 claims_bp = Blueprint("claims", __name__)
 
@@ -32,8 +33,10 @@ def make_claim(current_user_id, item_id):
     
     data = request.get_json()
 
-    if "message" not in data:
-        return jsonify({"error": "Message is required"}), 400
+    schema = ClaimSchema()
+    errors = schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     
     new_claim = Claim(
         message=data["message"],
@@ -100,8 +103,10 @@ def respond_to_claim(current_user_id, claim_id):
     data = request.get_json()
     response = data.get("status")
 
-    if response not in ["approved", "rejected"]:
-        return jsonify({"error": "Status must be approved or rejected"}), 400
+    schema = ClaimResponseSchema()
+    errors = schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     
     claim.status = response
 
