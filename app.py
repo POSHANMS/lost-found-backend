@@ -36,6 +36,9 @@ app.register_blueprint(items_bp, url_prefix="/api/items")
 from routes.claims import claims_bp
 app.register_blueprint(claims_bp, url_prefix="/api/claims")
 
+from routes.admin import admin_bp
+app.register_blueprint(admin_bp, url_prefix="/api/admin")
+
 @app.route("/")
 def index():
     return {"message": "FindIt API is running!"}
