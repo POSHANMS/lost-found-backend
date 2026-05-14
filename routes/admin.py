@@ -11,7 +11,7 @@ admin_bp = Blueprint("admin", __name__)
 
 @admin_bp.route("/users", methods=["GET"])
 @admin_required
-def get_all_users(current_user_id):
+def admin_get_all_users(current_user_id):
     users = User.query.all()
 
     return jsonify({
@@ -33,7 +33,7 @@ def get_all_users(current_user_id):
 
 @admin_bp.route("/users/<int:user_id>/ban", methods=["PUT"])
 @admin_required
-def ban_user(current_user_id, user_id):
+def admin_ban_user(current_user_id, user_id):
     user = User.query.get(user_id)
 
     if not user:
@@ -50,7 +50,7 @@ def ban_user(current_user_id, user_id):
 
 @admin_bp.route("/items", methods=["GET"])
 @admin_required
-def get_all_items(current_user_id):
+def admin_get_all_items(current_user_id):
     items = Item.query.order_by(Item.created_at.desc()).all()
 
     return jsonify({
@@ -86,7 +86,7 @@ def admin_delete_item(current_user_id, item_id):
 
 @admin_bp.route("/stats", methods=["GET"])
 @admin_required
-def get_stats(current_user_id):
+def admin_get_stats(current_user_id):
     total_users = User.query.count()
     total_items = Item.query.count()
     lost_items = Item.query.filter_by(status="lost").count()
