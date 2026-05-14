@@ -5,6 +5,7 @@ import bcrypt
 import jwt
 import os
 from datetime import datetime, timedelta
+from schemas.user_schema import RegisterSchema, LoginSchema
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -37,12 +38,12 @@ def generate_tokens(user_id):
 def register():
     data = request.get_json()                       # get JSON body from request
 
-    # check if all required fields are present
-    required = ["name", "email", "password", "phone", "department"]
-    for field in required:
-        if field not in data:
-            return jsonify({"error": f"{field} is required"}), 400
-        
+    # validate input using Marshmallow schema
+    schema = RegisterSchema()
+    errors = schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+    
     # check if email already exists
     existing_user = User.query.filter_by(email=data["email"]).first()
     if existing_user:
@@ -88,8 +89,10 @@ def register():
 def login():
     data = request.get_json()
 
-    if "email" not in data or "password" not in data:
-        return jsonify({"error": "Email and password are required"}), 400
+    schema = LoginSchema()
+    errors = schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     
     # find user by email
     user = User.query.filter_by(email=data["email"]).first()
