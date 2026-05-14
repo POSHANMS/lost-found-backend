@@ -12,7 +12,7 @@ class ItemSchema(Schema):
     )
     category = fields.Str(
         required=True,
-        validate=validate.OneOf([
+        validate=validate.OneOf([                               # must be one of these categories
             "Electronics", "Documents", "Accessories",
             "Clothing", "Keys", "Bags", "Other"
         ])
