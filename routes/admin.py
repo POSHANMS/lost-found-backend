@@ -71,7 +71,7 @@ def get_all_items(current_user_id):
 
 @admin_bp.route("/items/<int:item_id>", methods=["DELETE"])
 @admin_required
-def delete_item(current_user_id, item_id):
+def admin_delete_item(current_user_id, item_id):
     item = Item.query.get(item_id)
 
     if not item:
