@@ -6,6 +6,7 @@ from utils.auth_middleware import token_required
 import cloudinary
 import cloudinary.uploader
 import os
+from schemas.item_schema import ItemSchema
 
 # configure cloudinary
 cloudinary.config(
@@ -103,11 +104,16 @@ def create_item(current_user_id):
     latitude = request.form.get("latitude")
     longitude = request.form.get("longitude")
 
-    if not all([title, description, category, status, location]):
-        return jsonify({"error": "All fields are required"}), 400
-    
-    if status not in ["lost", "found"]:
-        return jsonify({"error": "Status must be lost or found"}), 400
+    schema = ItemSchema()
+    errors = schema.validate({
+        "title": title,
+        "description": description,
+        "category": category,
+        "status": status,
+        "location": location
+    })
+    if errors:
+        return jsonify({"errors": errors}), 400
     
     image_url = None
 
