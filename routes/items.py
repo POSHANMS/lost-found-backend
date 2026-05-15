@@ -3,18 +3,9 @@ from extensions import db, limiter
 from models.item import Item
 from models.user import User
 from utils.auth_middleware import token_required
-import cloudinary
-import cloudinary.uploader
-import os
 from schemas.item_schema import ItemSchema
 from utils.cache import cache_get, cache_set, cache_delete_pattern
-
-# configure cloudinary
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET")
-)
+from utils.cloudinary import upload_image
 
 items_bp = Blueprint("items", __name__)
 
@@ -135,11 +126,7 @@ def create_item(current_user_id):
     if "image" in request.files:
         file = request.files["image"]
         if file.filename != "":
-            upload_result = cloudinary.uploader.upload(
-                file,
-                folder="findit"             # store in findit folder on cloudinary
-            )
-            image_url = upload_result["secure_url"]         # get the HTTPS URL back
+            image_url = upload_image(file)
 
     new_item = Item(
         title=title,
