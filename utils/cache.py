@@ -15,7 +15,7 @@ def cache_set(key, value, expiry=300):
     value  → any Python dict or list (we convert to JSON string)
     expiry → how long to keep in seconds (default 5 minutes)
     """
-    redis_client.setex(key, expiry, json.dump(value))
+    redis_client.setex(key, expiry, json.dumps(value))
 
 def cache_get(key):
     """
