@@ -7,6 +7,7 @@ import cloudinary
 import cloudinary.uploader
 import os
 from schemas.item_schema import ItemSchema
+from utils.cache import cache_get, cache_set, cache_delete_pattern
 
 # configure cloudinary
 cloudinary.config(
@@ -29,6 +30,14 @@ def get_items():
     page = request.args.get("page", 1, type=int)            # default page 1
     per_page = request.args.get("per_page", 10, type=int)   # default 10 per page
 
+    # build a cache key based on the filters
+    cache_key = f"items:page:{page}:per:{per_page}:status:{status}:category:{category}:search:{search}"
+
+    # check cache first
+    cached = cache_get(cache_key)
+    if cached:
+        return jsonify(cached), 200
+
     query = Item.query.filter_by(is_resolved=False)    # only show unresolved items
 
     if status:
@@ -43,7 +52,7 @@ def get_items():
         page=page, per_page=per_page, error_out=False
     )
 
-    return jsonify({
+    response_data = {
         "items": [
             {
                 "id": item.id,
@@ -59,12 +68,17 @@ def get_items():
                 "created_at": item.created_at.isoformat(),
                 "posted_by": item.owner.name
             }
-            for item in items.items             # loop through paginated items
+            for item in items.items
         ],
         "total": items.total,
         "pages": items.pages,
         "current_page": items.page
-    }), 200
+    }
+
+    # save to cache for 5 minutes
+    cache_set(cache_key, response_data, expiry=300)
+
+    return jsonify(response_data), 200
 
 # ─── GET SINGLE ITEM ───────────────────────────────────────────────────────
 
@@ -141,6 +155,9 @@ def create_item(current_user_id):
 
     db.session.add(new_item)
     db.session.commit()
+
+    # clear items cache so next request gets fresh data
+    cache_delete_pattern("items:*")
 
     return jsonify({
         "message": "Item posted successfully",
