@@ -5,6 +5,7 @@ from models.item import Item
 from models.notification import Notification
 from utils.auth_middleware import token_required
 from schemas.claim_schema import ClaimSchema, ClaimResponseSchema
+from utils.email import send_claim_notification, send_claim_response
 
 claims_bp = Blueprint("claims", __name__)
 
@@ -53,6 +54,16 @@ def make_claim(current_user_id, item_id):
     )
     db.session.add(notification)
     db.session.commit()
+
+    # send email to item owner
+    try:
+        send_claim_notification(
+            to_email=item.owner.email,
+            item_title=item.title,
+            claimant_name=new_claim.claimant.name
+        )
+    except Exception:
+        pass    # don't fail the request if email fails
 
     return jsonify({"message": "Claim submitted successfully"}), 201
 
@@ -121,5 +132,15 @@ def respond_to_claim(current_user_id, claim_id):
     )
     db.session.add(notification)
     db.session.commit()
+
+    # send email to claimant
+    try:
+        send_claim_response(
+            to_email=claim.claimant.email,
+            item_title=claim.item.title,
+            status=response
+        )
+    except Exception:
+        pass    # don't fail the request if email fails
 
     return jsonify({"message": f"Claim {response} successfully"}), 200
