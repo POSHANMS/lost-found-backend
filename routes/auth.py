@@ -34,7 +34,7 @@ def generate_tokens(user_id):
 # ─── REGISTER ──────────────────────────────────────────────────────────────
 
 @auth_bp.route("/register", methods=["POST"])
-@limiter.limit("5 per minute")                      # max 5 register attempts per minute
+@limiter.limit(os.getenv("REGISTER_LIMIT", "5 per minute"))                    # max 5 register attempts per minute
 def register():
     data = request.get_json()                       # get JSON body from request
 

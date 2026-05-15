@@ -2,6 +2,7 @@ import pytest
 from app import app, db
 from models.user import User
 from models.item import Item
+from flask_limiter import Limiter
 import bcrypt
 import jwt
 import os
@@ -12,6 +13,7 @@ def client():
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["RATELIMIT_ENABLED"] = False
+    app.config["RATELIMIT_STORAGE_URI"] = "memory://"
 
     with app.app_context():
         db.engine.dispose()

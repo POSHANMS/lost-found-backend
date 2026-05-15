@@ -2,6 +2,7 @@ import pytest
 from app import app, db
 from models.user import User
 from models.item import Item
+from flask_limiter import Limiter
 import bcrypt
 
 
@@ -10,6 +11,7 @@ def client():
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["RATELIMIT_ENABLED"] = False
+    app.config["RATELIMIT_STORAGE_URI"] = "memory://"
 
     with app.app_context():
         db.engine.dispose()
@@ -93,7 +95,7 @@ def test_duplicate_claim(client):
 
 
 def test_claim_nonexistent_item(client):
-    token = register_and_login(client)
+    token = register_and_login(client, "unique@test.com")
 
     response = client.post("/api/claims/999", json={
         "message": "This is my wallet, it has my ID inside"

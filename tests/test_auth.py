@@ -1,6 +1,7 @@
 import pytest
 from app import app, db
 from models.user import User
+from flask_limiter import Limiter
 import bcrypt
 
 
@@ -9,15 +10,15 @@ def client():
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["RATELIMIT_ENABLED"] = False
+    app.config["RATELIMIT_STORAGE_URI"] = "memory://"
 
-    # force SQLAlchemy to use the new URI
     with app.app_context():
-        db.engine.dispose()        # close existing connections
-        db.create_all()            # create tables in SQLite memory
+        db.engine.dispose()
+        db.create_all()
         with app.test_client() as client:
             yield client
         db.session.remove()
-        db.drop_all()              # drop SQLite tables (not Supabase)
+        db.drop_all()# drop SQLite tables (not Supabase)
 
 
 def test_register_success(client):
