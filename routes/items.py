@@ -117,6 +117,8 @@ def create_item(current_user_id):
     location = request.form.get("location")
     latitude = request.form.get("latitude")
     longitude = request.form.get("longitude")
+    image_url = request.form.get("image_url")
+    image_public_id = request.form.get("image_public_id")
 
     schema = ItemSchema()
     errors = schema.validate({
@@ -129,13 +131,8 @@ def create_item(current_user_id):
     if errors:
         return jsonify({"errors": errors}), 400
     
-    image_url = None
-
-    # if image was uploaded, send it to cloudinary
-    if "image" in request.files:
-        file = request.files["image"]
-        if file.filename != "":
-            image_url = upload_image(file)
+    # get image_url sent from frontend (already uploaded to Cloudinary)
+    image_url = request.form.get("image_url") or None
 
     new_item = Item(
         title=title,
