@@ -148,3 +148,24 @@ def refresh():
         return jsonify({"error": "Refresh token expired, please login again"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid refresh token"}), 401
+    
+
+    # ─── GET CURRENT USER (protected) ─────────────────────────────────────────
+
+    @auth_bp.route("/me", methods=["GET"])
+    @token_required
+    def get_me(current_user_id):
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "role": user.role,
+                "department": user.department,
+                "phone": user.phone
+            }
+        }), 200
