@@ -62,6 +62,12 @@ def make_claim(current_user_id, item_id):
     db.session.add(notification)
     db.session.commit()
 
+    # emit real time notification via Socket.io
+    from extensions import socketio
+    socketio.emit('notification', {
+        'message': f"Someone claimed your item: {item.title}"
+    }, room=f"user_{item.user_id}")
+
     # send email to item owner
     try:
         send_claim_notification(
@@ -139,6 +145,12 @@ def respond_to_claim(current_user_id, claim_id):
     )
     db.session.add(notification)
     db.session.commit()
+
+    # emit real time notification via Socket.io
+    from extensions import socketio
+    socketio.emit('notification', {
+        'message': f"Your claim for '{claim.item.title}' was {response}"
+    }, room=f"user_{claim.user_id}")
 
     # send email to claimant
     try:

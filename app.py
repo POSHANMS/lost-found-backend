@@ -47,6 +47,14 @@ app.register_blueprint(notifications_bp, url_prefix="/api/notifications")
 from routes.admin import admin_bp
 app.register_blueprint(admin_bp, url_prefix="/api/admin")
 
+from flask_socketio import join_room
+
+@socketio.on('join')
+def handle_join(data):
+    user_id = data.get('user_id')
+    if user_id:
+        join_room(f"user_{user_id}")
+
 @app.route("/")
 def index():
     return {"message": "FindIt API is running!"}
