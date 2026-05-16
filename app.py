@@ -5,6 +5,7 @@ from flask_limiter.util import get_remote_address
 from flask_cors import CORS
 import os
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -39,6 +40,9 @@ app.register_blueprint(items_bp, url_prefix="/api/items")
 
 from routes.claims import claims_bp
 app.register_blueprint(claims_bp, url_prefix="/api/claims")
+
+from routes.notifications import notifications_bp
+app.register_blueprint(notifications_bp, url_prefix="/api/notifications")
 
 from routes.admin import admin_bp
 app.register_blueprint(admin_bp, url_prefix="/api/admin")

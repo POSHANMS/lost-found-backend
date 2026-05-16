@@ -40,7 +40,7 @@ def make_claim(current_user_id, item_id):
         return jsonify({"errors": errors}), 400
     
     new_claim = Claim(
-        message=data["message"],
+        message=data.get("message", ""),
         user_id=current_user_id,
         item_id=item_id
     )
@@ -144,3 +144,24 @@ def respond_to_claim(current_user_id, claim_id):
         pass    # don't fail the request if email fails
 
     return jsonify({"message": f"Claim {response} successfully"}), 200
+
+# ─── GET MY CLAIMS (protected) ─────────────────────────────────────────────
+
+@claims_bp.route("/mine", methods=["GET"])
+@token_required
+def get_my_claims(current_user_id):
+    claims = Claim.query.filter_by(user_id=current_user_id).all()
+
+    return jsonify({
+        "claims": [
+            {
+                "id": claim.id,
+                "item_id": claim.item_id,
+                "item_title": claim.item.title if claim.item else "Unknown",
+                "message": claim.message,
+                "status": claim.status,
+                "created_at": claim.created_at.isoformat(),
+            }
+            for claim in claims
+        ]
+    }), 200
