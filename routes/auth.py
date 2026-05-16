@@ -6,6 +6,7 @@ import jwt
 import os
 from datetime import datetime, timedelta
 from schemas.user_schema import RegisterSchema, LoginSchema
+from utils.auth_middleware import token_required
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -121,51 +122,29 @@ def login():
         }
     }), 200
 
-# ─── REFRESH TOKEN ─────────────────────────────────────────────────────────
+# ─── GET CURRENT USER (protected) ─────────────────────────────────────────
 
-@auth_bp.route("/refresh", methods=["POST"])
-def refresh():
-    data = request.get_json()
+@auth_bp.route("/me", methods=["GET"])
+@token_required
+def get_me(current_user_id):
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
-    if "refresh_token" not in data:
-        return jsonify({"error": "Refresh token is required"}), 400
-    
-    try:
-        payload = jwt.decode(
-            data["refresh_token"],
-            os.getenv("JWT_REFRESH_SECRET"),
-            algorithms=["HS256"]
-        )
-        user_id = payload["user_id"]
-        access_token, refresh_token = generate_tokens(user_id)
+    return jsonify({
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "department": user.department,
+            "phone": user.phone
+        }
+    }), 200
 
-        return jsonify({
-            "access_token": access_token,
-            "refresh_token": refresh_token
-        }), 200
-    
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Refresh token expired, please login again"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid refresh token"}), 401
-    
 
-    # ─── GET CURRENT USER (protected) ─────────────────────────────────────────
+# ─── LOGOUT ────────────────────────────────────────────────────────────────
 
-    @auth_bp.route("/me", methods=["GET"])
-    @token_required
-    def get_me(current_user_id):
-        user = User.query.get(current_user_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-
-        return jsonify({
-            "user": {
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "role": user.role,
-                "department": user.department,
-                "phone": user.phone
-            }
-        }), 200
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    return jsonify({"message": "Logged out successfully"}), 200

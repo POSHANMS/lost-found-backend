@@ -24,7 +24,7 @@ def cache_get(key):
     """
     data = redis_client.get(key)
     if data:
-        return json.load(data)      # convert JSON string back to Python dict
+        return json.loads(data)      # convert JSON string back to Python dict
     return None
 
 def cache_delete(key):
