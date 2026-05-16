@@ -39,6 +39,13 @@ def make_claim(current_user_id, item_id):
     if errors:
         return jsonify({"errors": errors}), 400
     
+    # verify the answer before creating claim
+    answer = data.get("answer", "").strip().lower()
+    correct_answer = (item.verification_answer or "").strip().lower()
+
+    if answer != correct_answer:
+        return jsonify({"error": "Wrong answer to verification question"}), 400
+
     new_claim = Claim(
         message=data.get("message", ""),
         user_id=current_user_id,

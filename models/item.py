@@ -13,7 +13,9 @@ class Item(db.Model):
     latitude = db.Column(db.Float, nullable=True)                   # for map pin
     longitude = db.Column(db.Float, nullable=True)                  # for map pin
     image_url = db.Column(db.String(500), nullable=True)            # Cloudinary image URL
-    is_resolved = db.Column(db.Boolean, default=False)              # True when item is returned
+    is_resolved = db.Column(db.Boolean, default=False)            # True when item is returned
+    verification_question = db.Column(db.String(300), nullable=True)   # question to verify ownership
+    verification_answer = db.Column(db.String(300), nullable=True)      # answer (never shown publicly)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)    # when item was posted
 
     # which user posted this item

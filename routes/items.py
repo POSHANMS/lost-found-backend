@@ -101,7 +101,8 @@ def get_item(item_id):
         "is_resolved": item.is_resolved,
         "created_at": item.created_at.isoformat(),
         "posted_by": item.owner.name,
-        "user_id": item.user_id
+        "user_id": item.user_id,
+        "verification_question": item.verification_question
     }), 200
 
 # ─── POST NEW ITEM (protected) ─────────────────────────────────────────────
@@ -143,7 +144,9 @@ def create_item(current_user_id):
         latitude=float(latitude) if latitude else None,
         longitude=float(longitude) if longitude else None,
         image_url=image_url,
-        user_id=current_user_id
+        user_id=current_user_id,
+        verification_question = request.form.get("verification_question"),
+        verification_answer = request.form.get("verification_answer")
     )
 
     db.session.add(new_item)
