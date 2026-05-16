@@ -56,13 +56,17 @@ def register():
         bcrypt.gensalt()
     ).decode("utf-8")
 
-    # create new user
+    # first user to register becomes admin automatically
+    user_count = User.query.count()
+    role = 'admin' if user_count == 0 else 'student'
+
     new_user = User(
         name=data["name"],
         email=data["email"],
         password=hashed_password,
         phone=data["phone"],
-        department=data["department"]
+        department=data["department"],
+        role=role
     )
 
     db.session.add(new_user)
