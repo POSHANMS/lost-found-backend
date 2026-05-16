@@ -13,33 +13,44 @@ items_bp = Blueprint("items", __name__)
 
 @items_bp.route("/", methods=["GET"])
 def get_items():
-    # get optional filter params from URL
-    # example: /api/items?status=lost&category=Electronics
     status = request.args.get("status")
     category = request.args.get("category")
     search = request.args.get("search")
-    page = request.args.get("page", 1, type=int)            # default page 1
-    per_page = request.args.get("per_page", 10, type=int)   # default 10 per page
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+    my_items = request.args.get("my")
 
-    # build a cache key based on the filters
-    cache_key = f"items:page:{page}:per:{per_page}:status:{status}:category:{category}:search:{search}"
+    # if ?my=true, try to get current user from token
+    current_user_id = None
+    if my_items:
+        import jwt, os
+        token = request.headers.get("Authorization", "").replace("Bearer ", "")
+        try:
+            payload = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=["HS256"])
+            current_user_id = payload.get("user_id")
+        except:
+            pass
 
-    # check cache first
+    cache_key = f"items:page:{page}:per:{per_page}:status:{status}:category:{category}:search:{search}:my:{my_items}:user:{current_user_id}"
+
     cached = cache_get(cache_key)
     if cached:
         return jsonify(cached), 200
 
-    query = Item.query.filter_by(is_resolved=False)    # only show unresolved items
+    # filter by owner if ?my=true
+    if my_items and current_user_id:
+        query = Item.query.filter_by(user_id=current_user_id)
+    else:
+        query = Item.query.filter_by(is_resolved=False)
 
     if status:
         query = query.filter_by(status=status)
     if category:
         query = query.filter_by(category=category)
     if search:
-        query = query.filter(Item.title.ilike(f"%{search}%"))    # case-insensitive search
+        query = query.filter(Item.title.ilike(f"%{search}%"))
 
-    # paginate results
-    items = query.order_by(Item.created_at.desc()).paginate(  
+    items = query.order_by(Item.created_at.desc()).paginate(
         page=page, per_page=per_page, error_out=False
     )
 
@@ -66,9 +77,7 @@ def get_items():
         "current_page": items.page
     }
 
-    # save to cache for 5 minutes
     cache_set(cache_key, response_data, expiry=300)
-
     return jsonify(response_data), 200
 
 # ─── GET SINGLE ITEM ───────────────────────────────────────────────────────
