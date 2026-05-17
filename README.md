@@ -13,11 +13,11 @@
 
 ## 🔗 Links
 
-> **Live API:** [https://findit-backend.onrender.com](https://findit-backend.onrender.com)
+> **Live API:** [https://findit-backend-smpr.onrender.com](https://findit-backend-smpr.onrender.com)
+> **Frontend:** [https://findit-portal.vercel.app](https://findit-portal.vercel.app)
 > **Frontend Repo:** [https://github.com/POSHANMS/lost-found-frontend](https://github.com/POSHANMS/lost-found-frontend)
 
 ---
-
 ## ✨ Features
 
 ### Authentication & Users
