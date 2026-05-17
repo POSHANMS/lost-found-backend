@@ -43,7 +43,7 @@ def make_claim(current_user_id, item_id):
     answer = data.get("answer", "").strip().lower()
     correct_answer = (item.verification_answer or "").strip().lower()
 
-    if answer != correct_answer:
+    if answer not in correct_answer and correct_answer not in answer:
         return jsonify({"error": "Wrong answer to verification question"}), 400
 
     new_claim = Claim(
