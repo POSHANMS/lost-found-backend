@@ -208,4 +208,7 @@ def delete_item(current_user_id, item_id):
     db.session.delete(item)
     db.session.commit()
 
+    # clear items cache so Browse shows fresh data immediately
+    cache_delete_pattern("items:*")
+
     return jsonify({"message": "Item deleted successfully"}), 200

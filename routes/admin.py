@@ -4,6 +4,7 @@ from models.user import User
 from models.item import Item
 from models.claim import Claim
 from utils.auth_middleware import admin_required
+from utils.cache import cache_delete_pattern
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -79,6 +80,8 @@ def admin_delete_item(current_user_id, item_id):
     
     db.session.delete(item)
     db.session.commit()
+
+    cache_delete_pattern("items:*")
 
     return jsonify({"message": "Item deleted successfully"}), 200
 
