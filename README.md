@@ -7,8 +7,7 @@
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Storage-3448C5?style=for-the-badge&logo=cloudinary)](https://cloudinary.com)
 [![Socket.io](https://img.shields.io/badge/Flask--SocketIO-5.3-010101?style=for-the-badge&logo=socketdotio)](https://flask-socketio.readthedocs.io)
 
-> REST API backend for the FindIt campus lost & found platform. Built with Flask, PostgreSQL on Supabase, Redis caching on Upstash, Socket.io real-time events, JWT authentication, Marshmallow validation, and rate limiting.
-
+> REST API backend for the FindIt campus lost & found platform. Students can register, post lost or found items with images and GPS location, browse and filter items, submit claims with anti-fraud verification, and receive real-time Socket.io notifications. Built with Flask, PostgreSQL on Supabase, Redis caching on Upstash, JWT authentication, Marshmallow validation, and rate limiting. Deployed on Render.
 ---
 
 ## 🔗 Links
